@@ -1,0 +1,16 @@
+# AI陪伴系统依赖
+
+# 核心依赖
+gradio==4.32.0
+ollama==0.1.9
+python-dotenv==1.0.1
+pyyaml==6.0.1
+
+# 可选依赖（云端API）
+openai==1.13.3
+anthropic==0.20.1
+
+# 开发依赖
+pytest==7.4.4
+black==24.2.0
+flake8==6.0.0
