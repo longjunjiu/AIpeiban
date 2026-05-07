@@ -20,19 +20,10 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt update
-        sudo apt install -y openjdk-17-jdk ant imagemagick
+        sudo apt install -y openjdk-17-jdk ant
     
     - name: Install buildozer
       run: pip install buildozer==1.5.0
-    
-    - name: Create resources directory
-      run: mkdir -p res
-    
-    - name: Create placeholder icons using ImageMagick
-      run: |
-        convert -size 512x512 xc:#4CAF50 -fill white -draw "circle 256,256 256,100" res/icon.png
-        convert -size 108x108 xc:#2196F3 -fill white -draw "circle 54,54 54,20" res/adaptive_icon.png
-        convert -size 1024x1024 xc:#F5F5F5 -fill #4CAF50 -draw "circle 512,512 512,200" res/splash.png
     
     - name: Build APK
       run: buildozer android debug

@@ -20,12 +20,12 @@ android.use_aapt2 = True
 # Requirements
 requirements = python3,kivy,requests,urllib3,chardet,idna,certifi
 
-# Icon
-android.icon = %(source.dir)s/res/icon.png
-android.adaptive_icon = %(source.dir)s/res/adaptive_icon.png
+# Icon (optional - using default icons)
+# android.icon = %(source.dir)s/res/icon.png
+# android.adaptive_icon = %(source.dir)s/res/adaptive_icon.png
 
-# Splash screen
-android.splashscreen = %(source.dir)s/res/splash.png
+# Splash screen (optional)
+# android.splashscreen = %(source.dir)s/res/splash.png
 android.splashscreen_color = #F5F5F5
 
 # Orientation
