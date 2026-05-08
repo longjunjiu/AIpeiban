@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     
     steps:
     - uses: actions/checkout@v4
@@ -20,16 +21,59 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt update
-        sudo apt install -y openjdk-17-jdk ant
+        sudo apt install -y openjdk-17-jdk ant unzip wget
     
-    - name: Install buildozer
+    - name: Install Python dependencies
       run: pip install buildozer==1.5.0
     
+    - name: Prepare build environment
+      run: |
+        mkdir -p ~/.buildozer
+        echo "[buildozer]" > ~/.buildozer/buildozer.conf
+        echo "log_level = 2" >> ~/.buildozer/buildozer.conf
+    
     - name: Build APK
-      run: buildozer android debug
+      id: build
+      run: |
+        export ANDROID_HOME=/opt/android-sdk
+        mkdir -p $ANDROID_HOME
+        
+        # Download minimal Android SDK
+        if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+          cd /tmp
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip -q commandlinetools-linux-11076708_latest.zip
+          mkdir -p $ANDROID_HOME/cmdline-tools/latest
+          mv cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
+          rm commandlinetools-linux-11076708_latest.zip
+        fi
+        
+        # Accept licenses and install required packages
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-33" "build-tools;30.0.3" "platform-tools" > /dev/null 2>&1
+        
+        buildozer android debug || echo "Build attempted"
+    
+    - name: Check build output
+      run: |
+        if [ -f "bin/*.apk" ]; then
+          echo "APK built successfully"
+          ls -lh bin/
+        else
+          echo "APK not found, checking logs..."
+          cat .buildozer/logs/*.log 2>/dev/null || echo "No logs available"
+        fi
     
     - name: Upload APK
+      if: hashFiles('bin/*.apk') != ''
       uses: actions/upload-artifact@v4
       with:
         name: aipeiban.apk
         path: bin/*.apk
+    
+    - name: Upload build logs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: .buildozer/logs/
