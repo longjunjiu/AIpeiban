@@ -6,6 +6,10 @@ ollama==0.1.9
 python-dotenv==1.0.1
 pyyaml==6.0.1
 
+# 语音交互依赖
+openai-whisper==20231117
+edge-tts==6.1.12
+
 # 可选依赖（云端API）
 openai==1.13.3
 anthropic==0.20.1
